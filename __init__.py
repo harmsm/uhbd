@@ -18,8 +18,6 @@ Version information:
 """
 
 __author__ = "Michael J. Harms"
-__date__ = "060519"
-__version__ = "0.5.0"
 
 
 import os, sys

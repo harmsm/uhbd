@@ -9,3 +9,6 @@ dielectric constants.
 Changed temporary directory.  Now writes out sane date.  Instead of random 
 number, appends sequential letter.  Also now writes to $HOME/.pyUHBD instead of
 script/scratch/.  (For multiple users).
+
+061219
+Moved pyUHBD into CVS.  0.6.1 release tagged to r0-6-1.  

@@ -4,6 +4,7 @@
                         B. Garcia-Moreno E. Lab
                       The Johns Hopkins University
                             August 2, 2006
+                       (Updated December 19, 2006)
 
 pyUHBD is a python wrapper that performes single-site finite difference contiuum
 electrostatics calculations on pdb files using the University of Houston 
@@ -18,7 +19,7 @@ Environment:
         getgrids
         doinps
         getpots
-        hybrid
+        hybrids
     NOTE: This script *REQUIRES* Python 2.4 or later!
     
 Input files:

@@ -55,8 +55,6 @@ Version Notes:
 """
 
 __author__ = "Michael J. Harms"
-__version__ = "0.6.0"
-__date__ = "060519"
 
 
 #*****************************************************************************#
@@ -77,7 +75,7 @@ uhbd = os.path.join(bin_path,'uhbd')
 getgrids = os.path.join(bin_path,'getgrids')
 doinps = os.path.join(bin_path,'doinps')
 getpots = os.path.join(bin_path,'getpots')
-hybrid = os.path.join(bin_path,'hybrid')
+hybrids = os.path.join(bin_path,'hybrid')
 
 # Function definitions
 
@@ -184,9 +182,9 @@ def main(filename,pH_start,pH_stop,pH_interval,ionic_strength,dielectric):
     shutil.copy('potentials','pkaS-potentials')
     shutil.copy('sitesinpr.pdb','pkaS-sitesinpr.pdb')
 
-    hybrid_run = os.popen(hybrid,'w')
-    hybrid_run.write("%s\n%s\n%s\n" % (pH_start,pH_stop,pH_interval))
-    hybrid_run.close()
+    hybrids_run = os.popen(hybrids,'w')
+    hybrids_run.write("%s\n%s\n%s\n" % (pH_start,pH_stop,pH_interval))
+    hybrids_run.close()
 
 def setupInp(pdb_name,ionic_strength,dielectric,css_cut=3.5):
     """

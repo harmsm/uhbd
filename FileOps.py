@@ -4,8 +4,6 @@ A set of functions that interact with the system.
 """
 
 __author__ = "Michael J. Harms"
-__date__ = "060817"
-__version__ = "0.1"
 
 # import modules
 import os, shutil, time, sys, random
@@ -43,14 +41,12 @@ def createTemporaryDirectory():
                                              time_tuple[4])
     current_time = current_time.replace(" ","0")    
 
-    letters = "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
-    
     tmp_dir_root = os.path.join(tmp_path,current_time)
     
-    letter_index = 0
-    while os.path.isdir("%s%s" % (tmp_dir_root,letters[letter_index])):
-        letter_index += 1 
-    tmp_dir = "%s%s" % (tmp_dir_root,letters[letter_index])
+    index = 0
+    while os.path.isdir("%s%i" % (tmp_dir_root,index)):
+        index += 1 
+    tmp_dir = "%s%s" % (tmp_dir_root,index)
     os.mkdir(tmp_dir)
     os.chdir(tmp_dir)
 

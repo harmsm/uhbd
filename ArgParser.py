@@ -25,8 +25,6 @@ of the class.
 """
 
 __author__ = "Michael J. Harms"
-__version__ = "0.2.0"
-__date__ = "060519"
 
 
 import os, sys, copy

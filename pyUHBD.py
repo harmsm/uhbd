@@ -5,8 +5,6 @@ The main script that is executed by a pyUHBD user.
 """
 
 __author__ = "Michael J. Harms"
-__date__ = "060519"
-__version__ = "0.6.1"
 
 __usage__ = \
 """
