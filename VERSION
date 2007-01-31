@@ -2,13 +2,23 @@
     Changed output directory structure slightly.  Now includes subfolders for
 dielectric constants.
     Used to be:
-        uhbd_calcs/{0.1,0.2...} 
+        uhbd_calcs/{0.1,0.2...}
     Now:
         uhbd_calcs/{D4,D10..}/{0.1,0.2...}
 
-Changed temporary directory.  Now writes out sane date.  Instead of random 
+Changed temporary directory.  Now writes out sane date.  Instead of random
 number, appends sequential letter.  Also now writes to $HOME/.pyUHBD instead of
 script/scratch/.  (For multiple users).
 
-061219
-Moved pyUHBD into CVS.  0.6.1 release tagged to r0-6-1.  
+0.6.1: 061219
+    Moved pyUHBD into CVS.  0.6.1 release tagged to r0-6-1.
+
+1.0.0: 070130
+    Major rewrite of pyUHBD.  Changed entire underlying module structure.  Now
+able to run full or single-site command lines.  Changed interface to comply with
+GNU/Posix standard.  Able to titrate arbitrary variables (not just protein
+dielectric constant and ionic strength).  Combined with addH to efficiently add
+polar hydrogens.  Removed temporary directory structure (calculations now done
+in their final directories).  
+
+Tagged first CVS release as r1-0-0

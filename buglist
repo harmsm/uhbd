@@ -1,0 +1,16 @@
+Known bugs/issues:
+    2007.01.30: For single-site claculations, n_terminus addition does not work
+                unless first residue is 1.  If first residue is 1, an nterminus
+                will always be added (even if you don't specify the flag).  I'll
+                probably have to rewrite prepares.
+    2007.01.30: Still need to deal with nasty header business.  If your pdb file
+                does not have a header line, the fortran silently mangles
+                everything and spits out almost-but-not-entirely-unreasonable
+                results.
+
+Features I want to add:
+    2007.01.30: Currently cannot deal with multiple chains, termini, or chains
+                with breaks.
+    2007.01.30: Have each run dump an output file detailing all settings
+    2007.01.30: Clean up I/O (particularly for addH)
+

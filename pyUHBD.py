@@ -1,209 +1,209 @@
+#!/usr/bin/env python
 """
 pyUHBD.py
 
-The main script that is executed by a pyUHBD user. 
+Main module for performing finite-difference poission-boltzmann calculations
+using uhbd.  Intended to be called from the command line.
 """
+
 
 __author__ = "Michael J. Harms"
 
-__usage__ = \
-"""
-pyUHBD runs UHBD in three different modes.  One of these must be specified.
+# The options in nonstandard_titr do not have the normal directory structure for
+# a titration: they are already in their own directories in every calculation.
+NONSTANDARD_TITR = ["protein_dielec","ionic_strength"]
 
-single: runs UHBD on a single file.
-    pyUHBD.py single pdb_file [optional arguments]
+import os, sys, shutil, copy
+from uhbd import ParseUhbd, GenerateUhbdInput
+from common import ProcessInputFiles, SystemOps
 
-multiple: runs UHBD on a directory
-    pyUHBD.py multiple directory [optional arguments]
+invocation_path = os.getcwd()
+pyUHBD_dir = os.path.realpath(os.path.split(__file__)[0])
 
-salts: runs UHBD on a single file at a set of salts.
-    pyUHBD.py salts pdb_file salts_file [optional arguments]
-
-dielec: runs UHBD on a single file for a set of protein dielectric constants.
-    pyUHBD.py dielec pdb_file dielectric_file [optional arguments]
-
-pyUHBD.py mode --help shows all options for that mode.
-"""
-
-
-import os, sys
-import __init__, ArgParser, FileOps, UhbdInterface
-
-def indivRun(filename,output_path,pH_start,pH_stop,pH_interval,ionic_strength,
-    dielectric):
+def setupOverride(calc_param,filename):
     """
-    Performs a single UHBD run.
+    Function that sets up override directory properly
     """
 
-    filename = os.path.join(__init__.invocation_path,filename)
-    
-    # Create output directory 
-    indiv_out_dir = os.path.join(__init__.invocation_path,output_path)
-    FileOps.makeDir(indiv_out_dir)
-                
-    # Perform UHBD run
-    UhbdInterface.setupInp(filename,ionic_strength,dielectric)
-    UhbdInterface.main(filename,pH_start,pH_stop,pH_interval,ionic_strength,
-        dielectric)
-    FileOps.copyFinalOutput(indiv_out_dir)
-    FileOps.runCleanup()
+    # Create output directory
+    output_dir = "%s_override" % filename[:-4]
+    SystemOps.makeDir(output_dir)
 
-
-def runSingle(arg):
-    """
-    Runs UHBD calculation on a single file.
-    """
-    
-    single = ArgParser.modeClass("single",["pdb_file"],["inpfile"],
-        ["dielectric", "ionic_strength","pHtitr","out_dir"])
-    single.parseArg(arg)
-
-    indivRun(single.required["pdb_file"],single.optional.out_dir,
-        single.optional.pHtitr[0],single.optional.pHtitr[1],
-        single.optional.pHtitr[2],single.optional.ionic_strength,
-        single.optional.dielectric)
-
-def runMultiple(arg):
-    """
-    Runs UHBD calculation on set of pdb files.
-    """
-
-    # Parse the command line arguments
-    multiple = ArgParser.modeClass("multiple",["pdb_dir"],["inpdir"],
-        ["dielectric", "ionic_strength","pHtitr","out_dir"])
-    multiple.parseArg(arg)   
- 
-    input_dir = multiple.required["pdb_dir"]
-    output_path = multiple.optional.out_dir
-    pH_start = multiple.optional.pHtitr[0]
-    pH_stop = multiple.optional.pHtitr[1]
-    pH_interval = multiple.optional.pHtitr[2]
-    ionic_strength = multiple.optional.ionic_strength
-    dielectric = multiple.optional.dielectric 
-
-    # Grab pdb files from specified directory.
-    pdb_list = os.listdir(input_dir) 
-    pdb_list = [f for f in pdb_list if f[-4:] == ".pdb"]
-    pdb_list.sort()
-
-    base_path = os.path.join(__init__.invocation_path,input_dir,output_path)    
-    indiv_file_paths = [os.path.join(base_path,d[:-4]) for d in pdb_list]
-
-    FileOps.makeDir(base_path)
-    dielec_paths = []
-    for path in indiv_file_paths:
-        FileOps.makeDir(path)
-        dielec_paths.append(os.path.join(path,"D%.1F" % dielectric))
-        FileOps.makeDir(dielec_paths[-1])
-
-    for pdb_index, pdb in enumerate(pdb_list):
-        print "PDB FILE: %s" % pdb
-        output = os.path.join(dielec_paths[pdb_index],
-                                   "%.1F" % ionic_strength)
-        
-        # Create output directory
-        FileOps.makeDir(output)
-
-        # Run UHBD at this specific salt concentration
-        indivRun(pdb,output,pH_start,pH_stop,pH_interval,ionic_strength,
-                 dielectric)
-
-def runSalts(arg):
-    """
-    Runs UHBD calculation on set of salts in salts_file.
-    """
-
-    # Parse the command line arguments
-    salts = ArgParser.modeClass("salts",["pdb_file","salt_file"],
-        ["inpfile","inpfile"],["dielectric","pHtitr","out_dir"])
-    salts.parseArg(arg)
-    
-    filename = salts.required["pdb_file"]
-    salts_file = salts.required["salt_file"]
-    output_path = salts.optional.out_dir
-    pH_start = salts.optional.pHtitr[0]
-    pH_stop = salts.optional.pHtitr[1]
-    pH_interval = salts.optional.pHtitr[2]
-    dielectric = salts.optional.dielectric 
-
-    # Execute the indivRun function for every salt in salts_file
-    f = open(salts_file)
-    salts = [float(salt) for salt in f.readlines()]
+    # Read in override file
+    f = open(calc_param.override,'r')
+    over_file = f.readlines()
     f.close()
 
-    base_path = os.path.join(__init__.invocation_path,output_path)    
-    dielec_path = os.path.join(base_path,"D%.1F" % dielectric)
-    FileOps.makeDir(dielec_path)
-    
-    for salt in salts:
-        print "Ionic strength: %4.2F" % salt
-        salt_output = os.path.join(dielec_path,"%.1F" % salt)
-        
+    # Make sure that declared pdb file matches pdb file in input file
+    index = over_file.index("          NAME of mol 1 file\n") + 1
+    pdb_in_file = over_file[index].strip()
+    if pdb_in_file != os.path.split(filename)[-1]:
+        err = "pdb file on command line (%s) " % os.path.split(filename)[-1]
+        err += " does not match pdb file in override file (%s)!" % pdb_in_file
+        raise OSError(err)
+
+    # Find parameter files specified in override file
+    index = over_file.index("          NAME of charge and radius file\n") + 1
+    param_in_file = over_file[index].strip()
+
+
+    # Try to copy that file into the output directory
+    if os.path.isfile(param_in_file):
+        calc_param.param_file = calc_in_file
+        #shutil.copy(param_in_file,output_dir)
+    else:
+        # See if paramater file is in the pyUHBD/inputs directory
+        default_file = os.path.join(pyUHBD_dir,"parameters",
+                                    param_in_file)
+        if os.path.isfile(default_file):
+            calc_param.param_file = default_file
+            #shutil.copy(default_file,output_dir)
+        else:
+            # It cannot be found!
+            err = "Unable to locate parameter file %s " % param_in_file
+            err += "(specified in %s)." % calc_param.override
+            raise OSError(err)
+
+    return output_dir
+
+def indivRun(filename,calc_param):
+    """
+    Performs a single UHBD run.  If a variable is titrating, the titration is
+    run as well.
+    """
+
+    # Create fully specified path to filename
+    filename = os.path.join(invocation_path,filename)
+
+    if calc_param.titration == None:
+
         # Create output directory
-        FileOps.makeDir(salt_output)
+        if calc_param.override != None:
+            output_dir = setupOverride(calc_param,filename)
+        else:
+            output_dir = [filename[:-4],"D%.1F" % calc_param.protein_dielec,
+                          "%.1F" % calc_param.ionic_strength]
+            output_dir = os.path.join(*output_dir)
+            SystemOps.makeDir(output_dir)
 
-        # Run UHBD at this specific salt concentration
-        indivRun(filename,salt_output,pH_start,pH_stop,pH_interval,salt,
-                 dielectric)
+        # Run calculation
+        runCore(filename,output_dir,calc_param)
 
-def runDielec(arg):
+    else:
+        titr_var = calc_param.titration[0]
+        for t in calc_param.titr_values:
+
+            # Set the calc parameter that is titrating to the correct value
+            calc_param.__dict__[titr_var] = t
+
+            # Generate correct output directory name
+            if calc_param.titration[0] not in NONSTANDARD_TITR:
+                if type(t) == float:
+                    titr_dir = "%s_%.2F" % (calc_param.titration[0],t)
+                else:
+                    titr_dir = "%s_%s" % (calc_param.titration[0],t)
+            else:
+                titr_dir = ""
+
+            # Create output directory
+            output_dir = [filename[:-4],calc_param.calc_type,
+                          "D%.1F" % calc_param.protein_dielec,
+                          "%.1F" % calc_param.ionic_strength,
+                          titr_dir]
+            output_dir = os.path.join(*output_dir)
+            SystemOps.makeDir(output_dir)
+
+            # Run uhbd
+            print "Titration %s: %s\n" % (titr_var,t),
+            runCore(filename,output_dir,calc_param)
+
+
+def runCore(filename,output_dir,calc_param):
     """
-    Runs UHBD calculation with a set of dielectric constants in dielc_file.
+    The core operations that are done during a uhbd calculation.
     """
 
-    # Parse the command line arguments
-    dielec = ArgParser.modeClass("dielec",["pdb_file","dielec_file"],
-        ["inpfile","inpfile"],["ionic_strength","pHtitr","out_dir"])
-    dielec.parseArg(arg)
+    # Copy pdb file to calculation directory and chdir
+    shutil.copy(filename,output_dir)
+    os.chdir(output_dir)
 
-    filename = dielec.required["pdb_file"]
-    dielec_file = dielec.required["dielec_file"]
-    output_path = dielec.optional.out_dir
-    pH_start = dielec.optional.pHtitr[0]
-    pH_stop = dielec.optional.pHtitr[1]
-    pH_interval = dielec.optional.pHtitr[2]
-    salt = dielec.optional.ionic_strength
+    # Set up input file (either copy manual override or generate automatically).
+    if calc_param.override != None:
+        shutil.copy(calc_param.override,calc_param.inp_name)
+    else:
+        GenerateUhbdInput.createDoinp(filename,calc_param)
 
-    f = open(dielec_file)
-    dielectric_constants = [float(d) for d in f.readlines()]
+    # Copy parameter file into calculation directory
+    shutil.copy(calc_param.param_file,'.')
+
+    # Run calculation
+    calc_param.run_uhbd(calc_param)
+
+    # Delete temporary files
+    SystemOps.runCleanup(calc_param)
+
+    # Return to starting directory
+    os.chdir(invocation_path)
+
+
+def createIndivParam(filename,calc_param):
+    """
+    Generates an instance of calc_param indivdually tailored for the pdb file
+    passed in filename.  This instance is returned (and ultimately passed to
+    GenerateInputFile by pyUHBD).
+    """
+
+    # Make a copy of the instance lest we overwrite global parameters!
+    indiv_calc_param = copy.copy(calc_param)
+
+    # Read in pdb file
+    f = open(filename,'r')
+    pdb = f.readlines()
     f.close()
 
-    base_path = os.path.join(__init__.invocation_path,output_path)
+    # Find the first and last residues in the pdb file
+    residues = [int(line[22:26]) for line in pdb if line[0:4] == "ATOM"]
 
-    for dielectric in dielectric_constants:
-        print "dielectric constant: %4.2F" % dielectric 
-        
-        dielec_path = os.path.join(base_path,"D%.1F" % dielectric)
-        FileOps.makeDir(dielec_path)
+    if indiv_calc_param.n_terminus:
+        indiv_calc_param.first_residues = residues[0]
+    else:
+        indiv_calc_param.first_residues = residues[0] - 1
 
-        dielec_output = os.path.join(dielec_path,"%.1F" % salt)
-        FileOps.makeDir(dielec_output)
-        
-        indivRun(filename,dielec_output,pH_start,pH_stop,pH_interval,salt,
-                 dielectric)
+    if indiv_calc_param.c_terminus:
+        indiv_calc_param.last_residues = residues[-1]
+    else:
+        indiv_calc_param.last_residues = residues[-1] + 1
 
+    # Set up his, cys, and grids for this pdb file
+    indiv_calc_param.his_tautomers = \
+                    ProcessInputFiles.processHis(pdb,
+                                                 indiv_calc_param.his_tautomers)
+    indiv_calc_param.cys_titrate = \
+                    ProcessInputFiles.processCys(pdb,
+                                                 indiv_calc_param.cys_titrate)
+    indiv_calc_param.grid = \
+                    ProcessInputFiles.processGrid(pdb,
+                                                  indiv_calc_param.grid)
+    indiv_calc_param.pdb_file = os.path.split(filename)[-1]
+    indiv_calc_param.keep_files.append(indiv_calc_param.pdb_file)
 
-# Dictionary of possible modes
-possible_modes = {"single":runSingle,"multiple":runMultiple,"salts":runSalts,
-                  "dielec":runDielec}
-
-# Make sure a proper mode is specified.  If it is not, raise exception and exit.
-try:
-    mode_key = sys.argv.pop(1)
-    if mode_key not in possible_modes.keys():
-        raise KeyError
-except IndexError:
-    print "No mode specified!"
-    print __usage__
-    sys.exit()
-except KeyError:
-    print "Invalid mode '%s' specified!" % mode_key
-    print __usage__
-    sys.exit()
-
-# Execute mode function
-possible_modes[mode_key](sys.argv)
+    return indiv_calc_param
 
 
+def main():
+    """
+    Perform fdpb calculations on a set of pdb files.
+    """
 
+    ParseUhbd.main()
+    calc_param = ParseUhbd.calc_param
 
+    # Perform calculation on all files in file_list
+    for filename in ParseUhbd.file_list:
+        print "Calculation on %s" % filename
+        indiv_calc_param = createIndivParam(filename,calc_param)
+        indivRun(filename,indiv_calc_param)
+
+# If pyUHBD is invoked from the command line, run main
+if __name__ == "__main__":
+    main()

@@ -3,84 +3,66 @@
                            Michael J. Harms
                         B. Garcia-Moreno E. Lab
                       The Johns Hopkins University
-                            August 2, 2006
-                       (Updated December 19, 2006)
+                            January 30, 2007
+                               v 1.0.0
 
 pyUHBD is a python wrapper that performes single-site finite difference contiuum
-electrostatics calculations on pdb files using the University of Houston 
-Brownian Dynamics (UHBD) package.  
+electrostatics calculations on pdb files using the University of Houston
+Brownian Dynamics (UHBD) package.
 
-Environment: 
-    The system must have a valid compile of UHBD that is user executable.  
+Environment:
+    NOTE: This script *REQUIRES* Python 2.3 or later!
+
+    The system must have a valid compile of UHBD that is user executable.
     pyUHBD finds the location of this directory through the $UHBD environment
     variable.  Specifically, pyUHBD calls the following binaries:
-        prepares
-        uhbd
-        getgrids
-        doinps
-        getpots
-        hybrids
-    NOTE: This script *REQUIRES* Python 2.4 or later!
-    
+        uhbd (single site, full)
+        prepares (single site)
+        getgrids (single site), getgrid (full)
+        doinps (single site), doinp (full)
+        getpots (single site), getpot (full)
+        hybrids (single site), hybrid (full)
+
+    To run addH, the system must have a CHARMm binary.  Set the CHARMM
+    environment variable to the directory containing the binary and the
+    CHARMM_LIB environment variable to the directory containing the .rtf and
+    .prm files.
+
+
 Input files:
-    The main file required by pyUHBD is a pdb file *with* hydrogens.  We usually
-    add them using the CHARMm hbuild command, then use the UHBD command 
-    charmm2pdbs to convert it into "proper" UHBD readable format. 
+    The main file required by pyUHBD is a pdb file with hydrogens.  Such a file
+    can be created using addH.  There is a difference between the hydrogens
+    added for full or single-site calculations, so make sure that you specify
+    the correct option for addH.  The program will run with only a pdb file
+    (or set of pdb files) specified, but many other options can be chosen from
+    the command line (type pyUHBD -h for a list).  *NOTE*: Your pdb *MUST* have
+    a header line or the calculation will be silently mangled by the old fortran
+    code.  Something to fix for the next release.
 
-    Some modes (dielec and salts) require another input file.  This input file
-    is simply a list of dielectric constants/salt concentrations at which the
-    calculation will be run.  Lines beginning with "#" (no quotes) are ignored
-    as comments.
+    Some options require input files.  In most cases, these files can simply a
+    list of numbers separated by whitespace (spaces, tabs, character returns).
+    All lines beginning with "#" are treated as comments and ignored.  Two
+    notable exceptions are -g (grid) which requires a grid specification in
+    proper uhbd format:
+        1.5 65 65 65
+        1.0 40 40 40
+        ... (up to five grids)
+    and -o (override), which requires a properly formatted uhbd input file.
 
-    pyUHBD uses two standard input files, pkaS.dat and pkaS-doinp.inp.src, which
-    reside in the inputs/ folder.  pkaS.dat is a parameter file containing VDW 
-    radii and other information about each atom.  For more information see the 
-    UHBD documentation.  pkaS-doinp.inp.src is a template command file that 
-    pyUHBD uses to run UHBD.  In particular, every position in that file with
-    an "x" will be replaced automatically based on the pdb file and the other 
-    input files.  [NOTE! DO NOT MANUALLY EDIT THE "x" VALUES!  THEY WILL BE 
-    OVERWRITTEN BY pyUHBD.  The only lines can can be profitably edited are 
-    the grid sizes, the number of iterations, the temperature, the solvent 
-    dielectric constant, and the nmap/nsph values.] 
+    The user can also choose which parameter file to use (-a --parameter-file).
+    This is particularly important for full calculations.  When the user
+    specifies a parameter file, the program will first look in the calling
+    directory.  If the file is not there, it will look in pyUHBD/parameters.  If
+    it cannot find the file, the program will die.
 
-    The values that pyUHBD will fill in automatically are as follows:
-        1. Number of first residue in chain 
-        2. Number of last residue in chain
-        3. Number of histidines and their tautomeric state (NE2)
-        4. Coarse grid size.  (The code finds the longest distance separating
-           charge in the pdb, multiplies this by 1.5, then divides by 65 to get
-           the size of the coarse grids).
-        5. User-specified protein dielectric constant
-        6. User-specified ionic strength
-        7. Number of free cystines and their residue numbers.  (The code finds
-           free cys with a sipmle distance-cutoff.  If the SG-SG distance of two
-           cys is < 3.5 A, they are treated as a disulfide bond and are
-           ignored).  
+Output:
+    Output from a pyUHBD calculation is saved in a directory based on the pdb
+    file input:
+        pdb_root/[single | full]/D[dielectric constant]/[ionic strength]/output
+    The code does not perform any checks for previously performed calculations,
+    so make sure you don't aren't going to wipe out a previous calculation when
+    you set up a run.
 
-    The function that does these calculations if FileOps.setupInp.  
-
-Temporary files:
-    UHBD generates a fair number of temporary files.  pyUHBD only keeps those 
-    that will be informative.  During the run, temporary files are stored in 
-    $HOME/.pyUHBD.  If the run crashes for some reason, the last-accessed
-    temporary directory contains all of the temporary files for debugging
-    purposes.  These directories will have to be manually deleted as pyUHBD
-    keeps no record of crashed runs.  If the run exits normally, the results
-    will be copied to an output directory (usually uhbd_calcs, although this
-    can be changed at the command line) and the temporary directory will be
-    deleted.
-
-Invocation:
-    To start a run, cd in to the directory containing the pdb file(s) on which
-    you wish to perform calculations.  pyUHBD will use this directory as its
-    working directory (i.e. the directory where it will look for files and will
-    place its output directory).  To invoke, run:
-
-        python [SOME_PATH_TO_SCRIPT]/pyUHBD.py [mode] [arguments] [options]
-    
-    If you invoke the code without specifying a mode, it will list the available
-    modes for the version you are using.  If you type:
-
-        python pyUHBD.py SOME_MODE --help
-
-    you will get a list of required and optional arguments for that mode. 
+Outstanding Issues:
+    This code will not put on terminii or deal with multi-chain pdb files.  This
+    feature will be added in the next round.
