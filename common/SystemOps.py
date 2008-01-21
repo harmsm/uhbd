@@ -26,7 +26,8 @@ def checkEnvironVariable(variable_name):
 def makeDir(dir):
     """
     Create directory dir, recursively filling in directories if need be.  This
-    will wipe out the directory if it exists.
+    will wipe out the directory if it exists (i.e. checking before overwrite 
+    should be done elsewhere).
     """
 
     try:
@@ -34,7 +35,7 @@ def makeDir(dir):
     except OSError, value:
         if value[0] == 17:
             # If the directory exists, delete its contents. (This is to prevent
-            # weird fortran "file exists" type errors).
+            # fortran "file exists" type errors).
             dir_contents = [os.path.join(dir,f) for f in os.listdir(dir)]
             dir_contents = [f for f in dir_contents if os.path.isfile(f)]
             for f in dir_contents:

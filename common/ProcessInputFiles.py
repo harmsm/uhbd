@@ -1,13 +1,13 @@
 """
 ProcessInputFiles.py
 
-A general modules for processing pyUHBD input files.
+A module containing functions for processing pyUHBD input files.
 """
 
 __author__ = "Michael J. Harms"
 
 from math import sqrt
-import copy, os
+import os
 import SystemOps
 
 
@@ -27,9 +27,10 @@ def processHis(pdb,his_tautomers,default_his=2,
            tautomer.
     Either way, the function returns hist_out (a list of integers).
     """
+    his_names = ["HIS","HSD","HSE"]
 
     # List of histidine residues
-    his_resid = [l for l in pdb if l[0:4] == "ATOM" and l[17:20] == "HIS"]
+    his_resid = [l for l in pdb if l[0:4] == "ATOM" and l[17:20] in his_names] 
     his_resid = [l for l in his_resid
                  if l[12:17] == " CA  " or l[12:17] == "CA   "]
     his_resid = [int(l[22:26]) for l in his_resid]
@@ -60,16 +61,15 @@ def processHis(pdb,his_tautomers,default_his=2,
         # Make sure that the number of histidines in the input file match the
         # number in the pdb file.
         if len(his_out) != len(his_resid):
-            err = ["Number of his specified in "]
-            err.append("%s (%i) " % (his_tautomers,len(his_out)))
-            err.append("does not match number in pdb file (%i)" % len(his_resid))
-            err = "".join(err)
+            err = "Number of his specified in %s (%i) does not match number in"
+            err += "pdb file (%j)" 
+            err = err % (his_tautomers,len(his_out),len(his_resid))
+            
             raise MangledFileError(err)
 
     # If not input file is specified...
     else:
         his_out = [default_his for i in range(len(his_resid))]
-
 
     return his_out
 

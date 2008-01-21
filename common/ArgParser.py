@@ -67,4 +67,3 @@ class Parameters:
         """
         self.__dict__ = dict([(k,opt_options.__dict__[k])
                               for k in opt_options.__dict__.keys()])
-
