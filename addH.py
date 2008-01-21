@@ -61,7 +61,7 @@ def createIndivParam(filename,calc_param):
 
 def indivRun(filename,calc_param):
     """
-    Generates paramters specific to pdb file, creates a CHARMm input file, then
+    Generates paramters specific to pdb file, creates a CHARMM input file, then
     adds hydrogens to that file.
     """
 

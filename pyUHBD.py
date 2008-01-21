@@ -6,7 +6,6 @@ Main module for performing finite-difference poission-boltzmann calculations
 using uhbd.  Intended to be called from the command line.
 """
 
-
 __author__ = "Michael J. Harms"
 
 # The options in nonstandard_titr do not have the normal directory structure for
@@ -15,7 +14,7 @@ NONSTANDARD_TITR = ["protein_dielec","ionic_strength"]
 
 import os, sys, shutil, copy
 from uhbd import ParseUhbd, GenerateUhbdInput
-from common import ProcessInputFiles, SystemOps
+from common import ProcessInputFiles, SystemOps, Error
 
 invocation_path = os.getcwd()
 pyUHBD_dir = os.path.realpath(os.path.split(__file__)[0])
@@ -124,7 +123,8 @@ def runCore(filename,output_dir,calc_param):
     """
 
     # Copy pdb file to calculation directory and chdir
-    shutil.copy(filename,output_dir)
+    #shutil.copy(filename,output_dir)
+    shutil.copy(filename,os.path.join(output_dir,"proteinH.pdb"))
     os.chdir(output_dir)
 
     # Set up input file (either copy manual override or generate automatically).
@@ -137,7 +137,12 @@ def runCore(filename,output_dir,calc_param):
     shutil.copy(calc_param.param_file,'.')
 
     # Run calculation
-    calc_param.run_uhbd(calc_param)
+    try:
+        calc_param.run_uhbd(calc_param)
+    except Error.UhbdError, instance:
+        print instance
+        sys.exit()
+
 
     # Delete temporary files
     SystemOps.runCleanup(calc_param)
@@ -195,14 +200,13 @@ def main():
     Perform fdpb calculations on a set of pdb files.
     """
 
-    ParseUhbd.main()
-    calc_param = ParseUhbd.calc_param
+    calc_param, file_list = ParseUhbd.main()
 
     # Perform calculation on all files in file_list
-    for filename in ParseUhbd.file_list:
-        print "Calculation on %s" % filename
-        indiv_calc_param = createIndivParam(filename,calc_param)
-        indivRun(filename,indiv_calc_param)
+    for file in file_list:
+        print "Calculation on %s" % file
+        indiv_calc_param = createIndivParam(file,calc_param)
+        indivRun(file,indiv_calc_param)
 
 # If pyUHBD is invoked from the command line, run main
 if __name__ == "__main__":

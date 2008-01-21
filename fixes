@@ -1,0 +1,17 @@
+070131:
+When doing addH on files from MD trajectory, the program crashed because not
+all HIS are named HIS.  I altered common/ProcessInputFiles.py so that it could
+find HIS named HSE or HSD as well.
+
+070201:
+- Altered ParseCharmm|Uhbd.py.  Now sorts file_list before passing to main code.
+- Altered CharmmInterface.py.  Made titr_dict and possible_his compatible with
+  GROMACS pdb files.  (i.e. HISA/HISB/LYSH recognized residues.)
+- Added UhbdSingleFunctions.py.  This module is exactly analogous to
+  UhbdFullFunctions and performs prepares.  As a consequence, termini addition
+  now works properly.
+
+070202:
+- Fixed removed SomeError except statement.  (Error would be raised as IOError
+  in SystemOps).
+

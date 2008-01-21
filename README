@@ -23,7 +23,7 @@ Environment:
         getpots (single site), getpot (full)
         hybrids (single site), hybrid (full)
 
-    To run addH, the system must have a CHARMm binary.  Set the CHARMM
+    To run addH, the system must have a CHARMM binary.  Set the CHARMM
     environment variable to the directory containing the binary and the
     CHARMM_LIB environment variable to the directory containing the .rtf and
     .prm files.
