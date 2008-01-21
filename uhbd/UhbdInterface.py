@@ -8,9 +8,9 @@ __author__ = "Michael J. Harms"
 
 # ---------- Initialize module --------------------
 
-import __init__, UhbdFullFunctions
+import __init__, UhbdFullFunctions, UhbdSingleFunctions, UhbdErrorCheck
 import os, shutil
-from common import SystemOps
+from common import SystemOps, Error
 
 # Set up uhbd binary
 global uhbd
@@ -28,6 +28,8 @@ def runUHBD(inputfile,outputfile):
 
     global uhbd
 
+    print "uhbd < %s > %s" % (inputfile,outputfile)
+
     f = open(inputfile,'r')
     inp = f.read()
     f.close()
@@ -42,34 +44,36 @@ def runUHBD(inputfile,outputfile):
         err = "uhbd binary (%s) not executable" % uhbd
         raise IOError(err)
 
+    status = UhbdErrorCheck.checkOut(out,outputfile)
+
     g = open(outputfile,'w')
     g.write(out)
     g.close()
 
+    if status[0] == 1:
+        raise Error.UhbdError(status[1]) 
 
 def runSingleCalculation(calc_param):
     """Peform pH titration on filename."""
 
     # Set up aliases for binaries
-    prep = os.path.join(bin_path,'prepares')
     getgrid = os.path.join(bin_path,'getgrids')
     doinp = os.path.join(bin_path,'doinps')
     getpot = os.path.join(bin_path,'getpots')
     hybrid = os.path.join(bin_path,'hybrids')
 
     # Make sure that all of the executables exist:
-    to_check = [prep, getgrid, doinp, getpot, hybrid]
+    to_check = [getgrid, doinp, getpot, hybrid]
     checksum = sum([os.path.isfile(f) for f in to_check])
-    if checksum != 5:
+    if checksum != len(to_check):
         raise OSError("Not all required binaries in $UHBD (%s)" % bin_path)
 
-    print 'Prepares'
-    SystemOps.runBin(prep)
+    print 'prepares'
+    UhbdSingleFunctions.runPrepares(calc_param)
 
-    print 'uhbdini'
     runUHBD('pkaS-uhbdini.inp','pkaS-uhbdini.out')
 
-    print 'Getgrids'
+    print 'getgrids'
     SystemOps.runBin(getgrid)
 
     print 'Running stopnow loop.'
@@ -107,7 +111,6 @@ def runFullCalculation(calc_param):
     print 'Prepare'
     UhbdFullFunctions.runPrepare(calc_param)
 
-    print 'uhbdini'
     runUHBD('uhbdini.inp','uhbdini.out')
 
     print 'Getgrid'

@@ -90,7 +90,8 @@ def createDoinp(filename,calc_param):
     cys_str = "CYS to be included, how many? and their res numbers"
 
     # Generate list of instances of DoinpEntry (and children)
-    inp_file = [DoinpEntry("NAME of mol 1 file",calc_param.pdb_file),
+    inp_file = [DoinpEntry("NAME of mol 1 file","proteinH.pdb"),
+                            #calc_param.pdb_file),
                 DoinpEntry("NAME of charge and radius file",
                            os.path.split(calc_param.param_file)[-1]),
                 DoinpEntry("NUMBER of polypeptide chains of mol 1",

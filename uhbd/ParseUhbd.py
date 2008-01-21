@@ -55,10 +55,8 @@ default_location = os.path.realpath(os.path.join(default_location,"parameters"))
 def main():
     """
     Populate parser, parse command line, and generate an instance of Parameters
-    to hold clculation parameters.
+    to hold calculation parameters.
     """
-
-    global calc_param, file_list
 
     # ---------- Populate the parser --------------------
 
@@ -151,9 +149,9 @@ def main():
             file_list = [os.path.join(dir,f) for f in file_list]
             if len(file_list) == 0:
                 parser.error("%s does not contain any pdb files!" % dir)
+            file_list.sort()
         else:
-            parser.error("%s is not a pdb file or directory!" %
-                         args[0])
+            parser.error("%s is not a pdb file or directory!" % args[0])
 
     # ---------- Check for incompatible options --------------------
 
@@ -162,7 +160,7 @@ def main():
     if options.full and parser.defaults['param_file'] == options.param_file:
         if not options.override:
             err = "--full is specified with the default parameter file!  The "
-            err += " default file is for single-site calculations only. "
+            err += "default file is for single-site calculations only. "
             err += "Specify a different parameter file using --param_file."
             parser.error(err)
 
@@ -221,18 +219,16 @@ def main():
 
         # Make sure that the option is titratable
         if options.titration[0] not in available_titrations:
-            write_available = ["   %s\n" % t for t in available_titrations]
             msg = "%s cannot be titrated. " % options.titration[0]
-            msg = msg + "Available options are:\n" + "".join(write_available)
+            msg = msg + "Available options are:\n"
+            msg = msg + "".join(["   %s\n" % t for t in available_titrations])
+
             parser.error(msg)
 
         # Read in titration file
-        try:
-            titr_lines = SystemOps.readFile(options.titration[1])
-            if len(titr_lines) <= 0:
-                parser.error("%s is an empty file!" % options.titration[1])
-        except SomeError:
-            parser.error("%s is not a file!" % options.titration[1])
+        titr_lines = SystemOps.readFile(options.titration[1])
+        if len(titr_lines) <= 0:
+            parser.error("%s is an empty file!" % options.titration[1])
 
         # Determine type of titrating value
         option_type = type(options.__dict__[options.titration[0]])
@@ -243,3 +239,5 @@ def main():
             titr_values.extend(line.split())
         titr_values = [option_type(v) for v in titr_values]
         calc_param.__dict__.update([('titr_values',titr_values)])
+
+    return calc_param, file_list

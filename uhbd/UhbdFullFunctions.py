@@ -176,7 +176,8 @@ def prepareFull(pdb_file,group_param):
     """
 
     # Open pdb file and read it
-    f = open(pdb_file,'r')
+    #f = open(pdb_file,'r')
+    f = open("proteinH.pdb","r")
     pdb = f.readlines()
     f.close()
 
@@ -243,7 +244,8 @@ def makeUhbdini(calc_param):
     short_param_file = os.path.split(calc_param.param_file)[-1]
 
     uhbdini = [\
-    "read mol 1 file \"%s\"     pdb end\n" % calc_param.pdb_file,
+    #"read mol 1 file \"%s\"     pdb end\n" % calc_param.pdb_file,
+    "read mol 1 file \"%s\"     pdb end\n" % "proteinH.pdb",
     "set charge radii file \"%s\"     para neut end\n" % short_param_file,
     "\n elec setup mol 1\ncenter\n",
     " spacing   %.2F dime    %i    %i    %i\n" % (calc_param.grid[0][0],
