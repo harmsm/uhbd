@@ -16,6 +16,8 @@ class MangledFileError(Exception):
     Raise for input files that cannot be read.
     """
 
+    pass
+
 def processHis(pdb,his_tautomers,default_his=2,
                valid_his={"CD1":0,"ND1":1,"NE2":2}):
     """

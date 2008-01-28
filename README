@@ -3,8 +3,8 @@
                            Michael J. Harms
                         B. Garcia-Moreno E. Lab
                       The Johns Hopkins University
-                            January 30, 2007
-                               v 1.0.0
+                            January 28, 2008
+                               v 1.1.0
 
 pyUHBD is a python wrapper that performes single-site finite difference contiuum
 electrostatics calculations on pdb files using the University of Houston
@@ -17,27 +17,21 @@ Environment:
     pyUHBD finds the location of this directory through the $UHBD environment
     variable.  Specifically, pyUHBD calls the following binaries:
         uhbd (single site, full)
-        prepares (single site)
         getgrids (single site), getgrid (full)
-        doinps (single site), doinp (full)
         getpots (single site), getpot (full)
         hybrids (single site), hybrid (full)
 
-    To run addH, the system must have a CHARMM binary.  Set the CHARMM
-    environment variable to the directory containing the binary and the
-    CHARMM_LIB environment variable to the directory containing the .rtf and
-    .prm files.
+    Hydrogens are added to the pdb files using pdb_addH.py, which is part of the
+    pdb_tools package.
 
 
 Input files:
     The main file required by pyUHBD is a pdb file with hydrogens.  Such a file
-    can be created using addH.  There is a difference between the hydrogens
+    can be created using pdb_addH.  There is a difference between the hydrogens
     added for full or single-site calculations, so make sure that you specify
     the correct option for addH.  The program will run with only a pdb file
     (or set of pdb files) specified, but many other options can be chosen from
-    the command line (type pyUHBD -h for a list).  *NOTE*: Your pdb *MUST* have
-    a header line or the calculation will be silently mangled by the old fortran
-    code.  Something to fix for the next release.
+    the command line (type pyUHBD -h for a list).
 
     Some options require input files.  In most cases, these files can simply a
     list of numbers separated by whitespace (spaces, tabs, character returns).
@@ -62,7 +56,3 @@ Output:
     The code does not perform any checks for previously performed calculations,
     so make sure you don't aren't going to wipe out a previous calculation when
     you set up a run.
-
-Outstanding Issues:
-    This code will not put on terminii or deal with multi-chain pdb files.  This
-    feature will be added in the next round.

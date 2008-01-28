@@ -1,16 +1,43 @@
-Known bugs/issues:
-    2007.01.30: For single-site claculations, n_terminus addition does not work
-                unless first residue is 1.  If first residue is 1, an nterminus
-                will always be added (even if you don't specify the flag).  I'll
-                probably have to rewrite prepares.
-    2007.01.30: Still need to deal with nasty header business.  If your pdb file
-                does not have a header line, the fortran silently mangles
-                everything and spits out almost-but-not-entirely-unreasonable
-                results.
+070130:
+ - For single-site claculations, n_terminus addition does not work unless first
+   residue is 1.  If first residue is 1, an n terminus will always be added
+   (even if you don't specify the flag).  I'll probably have to rewrite
+   prepares.
+ - Still need to deal with nasty header business.  If your pdb file does not
+   have a header line, the fortran silently mangles everything and spits out
+   almost-but-not-entirely-unreasonable results.
+ - Currently cannot deal with multiple chains, termini, or chains with breaks.
+ - I/O (particularly for addH) is pretty bad.
 
-Features I want to add:
-    2007.01.30: Currently cannot deal with multiple chains, termini, or chains
-                with breaks.
-    2007.01.30: Have each run dump an output file detailing all settings
-    2007.01.30: Clean up I/O (particularly for addH)
+070131:
+ - When doing addH on files from MD trajectory, the program crashed because not
+   all HIS are named HIS.  I altered common/ProcessInputFiles.py so that it
+   could find HIS named HSE or HSD as well.
+
+070201:
+ - Altered ParseCharmm|Uhbd.py.  Now sorts file_list before passing to UHBD.
+ - Altered CharmmInterface.py.  Made titr_dict and possible_his compatible with
+   GROMACS pdb files.  (i.e. HISA/HISB/LYSH recognized residues.)
+ - Added UhbdSingleFunctions.py.  This module is exactly analogous to
+   UhbdFullFunctions and performs prepares and doinps.  As a consequence,
+   termini addition now works properly.
+
+070202:
+ - Fixed removed SomeError except statement.  (Error would be raised as IOError
+   in SystemOps).
+
+080128:
+ - I moved the addH capability into the pdb_tools module. The program now adds
+   termini correctly by comparing the ATOM sequence to the SEQRES sequence to 
+   determine if the whole sequence is in the structure.  The user can no longer
+   specify whether or not to use termini.  
+ - Deals with multiple chains (they are flattened by pdb_addH.py)
+ - Fixes incorrect pdb file headers.
+ - Accepts pdb files with arbitrarily long file names.   This previously did not
+   work because the original fortran only looks at 30 characters.  To get around
+   this, the program renames all pdb files to proteinH.pdb before passing to
+   UHBD).
+ - Checks for errors in the UHBD output.  
+ - Spits out a more detailed log of what it is doing at each step.
+
 

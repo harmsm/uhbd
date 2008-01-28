@@ -123,9 +123,22 @@ def runCore(filename,output_dir,calc_param):
     """
 
     # Copy pdb file to calculation directory and chdir
-    #shutil.copy(filename,output_dir)
     shutil.copy(filename,os.path.join(output_dir,"proteinH.pdb"))
     os.chdir(output_dir)
+
+    # Strip down to only ATOM entries, then add dummy remarks at the top and a
+    # proper END statement at the end.
+    f = open("proteinH.pdb","r")
+    pdb = f.readlines()
+    f.close()
+
+    pdb = [l for l in pdb if l[0:4] == "ATOM"]
+    pdb.insert(0,"%-79s\n%-79s\n" % ("REMARK","REMARK"))
+    pdb.append("END")
+
+    g = open("proteinH.pdb","w")
+    g.writelines(pdb)
+    g.close()
 
     # Set up input file (either copy manual override or generate automatically).
     if calc_param.override != None:
@@ -137,12 +150,7 @@ def runCore(filename,output_dir,calc_param):
     shutil.copy(calc_param.param_file,'.')
 
     # Run calculation
-    try:
-        calc_param.run_uhbd(calc_param)
-    except Error.UhbdError, instance:
-        print instance
-        sys.exit()
-
+    calc_param.run_uhbd(calc_param)
 
     # Delete temporary files
     SystemOps.runCleanup(calc_param)
