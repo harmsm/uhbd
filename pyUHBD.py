@@ -176,16 +176,8 @@ def createIndivParam(filename,calc_param):
 
     # Find the first and last residues in the pdb file
     residues = [int(line[22:26]) for line in pdb if line[0:4] == "ATOM"]
-
-    if indiv_calc_param.n_terminus:
-        indiv_calc_param.first_residues = residues[0]
-    else:
-        indiv_calc_param.first_residues = residues[0] - 1
-
-    if indiv_calc_param.c_terminus:
-        indiv_calc_param.last_residues = residues[-1]
-    else:
-        indiv_calc_param.last_residues = residues[-1] + 1
+    indiv_calc_param.first_residues = residues[0] - 1
+    indiv_calc_param.last_residues = residues[-1] + 1
 
     # Set up his, cys, and grids for this pdb file
     indiv_calc_param.his_tautomers = \
