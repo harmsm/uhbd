@@ -32,8 +32,7 @@ FULL_KEEPFILES =   ['hybrid.out','doinp.inp','pkaF-potentials']
 # solution of setting some global variables.
 
 # Options that the user cannot titrate
-NOT_TITRATABLE = ["full","n_terminus","c_terminus","keep_temp","titration",
-                  "ph_param","override"]
+NOT_TITRATABLE = ["full","keep_temp","titration","ph_param","override"]
 
 # Options compatible with the --override setting; everything else is
 # incompatible
@@ -68,10 +67,6 @@ def main():
                                     description=description)
 
     # Boolean options (not available for titration)
-    parser.add_option("-n","--n-terminus",action="store_true",default=False,
-                      help="Titrate n-terminus [DISABLED] [default %default]")
-    parser.add_option("-c","--c-terminus",action="store_true",default=False,
-                      help="Titrate c-terminus [DISABLED] [default %default]")
     parser.add_option("-f","--full",action="store_true",default=False,
                       help="Full-site calculation [default single-site]")
     parser.add_option("-k","--keep-temp",action="store_true",default=False,

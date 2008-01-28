@@ -54,7 +54,9 @@ def runUHBD(inputfile,outputfile):
         raise Error.UhbdError(status[1]) 
 
 def runSingleCalculation(calc_param):
-    """Peform pH titration on filename."""
+    """
+    Peform pH titration on filename.
+    """
 
     # Set up aliases for binaries
     getgrid = os.path.join(bin_path,'getgrids')
@@ -96,16 +98,15 @@ def runFullCalculation(calc_param):
     """Peform pH titration on filename."""
 
     # Set up aliases for binaries
-    prep = os.path.join(bin_path,'prepare')
     getgrid = os.path.join(bin_path,'getgrid')
     doinp = os.path.join(bin_path,'doinp')
     getpot = os.path.join(bin_path,'getpot')
     hybrid = os.path.join(bin_path,'hybrid')
 
     # Make sure that all of the executables exist:
-    to_check = [prep, getgrid, doinp, getpot, hybrid]
+    to_check = [getgrid, doinp, getpot, hybrid]
     checksum = sum([os.path.isfile(f) for f in to_check])
-    if checksum != 5:
+    if checksum != len(to_check):
         raise OSError("Not all required binaries in $UHBD (%s)" % bin_path)
 
     print 'Prepare'
