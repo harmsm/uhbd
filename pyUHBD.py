@@ -80,7 +80,8 @@ def indivRun(filename,calc_param):
         if calc_param.override != None:
             output_dir = setupOverride(calc_param,filename)
         else:
-            output_dir = [filename[:-4],"D%.1F" % calc_param.protein_dielec,
+            output_dir = [filename[:-4],calc_param.calc_type,
+                          "D%.1F" % calc_param.protein_dielec,
                           "%.1F" % calc_param.ionic_strength]
             output_dir = os.path.join(*output_dir)
             SystemOps.makeDir(output_dir)

@@ -170,6 +170,7 @@ def processGrid(pdb,grid):
 
     # If the grid file is not specified...
     else:
+
         # Load in coordinates of all Ca atoms
         ca = [l for l in pdb if l[0:4] == "ATOM" and l[12:15] == "CA "]
         coord = []
@@ -185,9 +186,9 @@ def processGrid(pdb,grid):
                     for k in range(3)])
         max_d = sqrt(max(d))
 
-        # Find top-level grid interval (2 * maximum dimension)/65.  If the
+        # Find top-level grid interval (3 * maximum dimension)/65.  If the
         # interval is less than 1.5 A, make it 1.5 A.
-        interval = (2*max_d)/65
+        interval = (3*max_d)/65
         if interval < 1.5:
             interval = 1.5
 
