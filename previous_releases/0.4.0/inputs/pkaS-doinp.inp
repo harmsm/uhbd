@@ -1,0 +1,35 @@
+          NAME of mol 1 file
+pkaSH.pdb
+          NAME of charge and radius file
+pkaS.dat
+          NUMBER of polypeptide chains of mol 1
+1
+          NUMBERS of first residues of each chain
+x 
+          NUMBERS of last residues of each chain
+x
+          NO of histidins, sites: 1=ND1=HISB; 2=NE2=HISA; 0=CE1 in A or B 
+x
+x x 
+          NO GRIDS; SPACING and dime (max 5 grids)
+4
+x x x x
+x x x x 
+0.75 40 40 40
+0.25 20 20 20 
+          MAXIMAL number of iterations for elec
+300 
+          TEMPERATURE in K
+298.0
+          DIELECTRIC constants of solvent and protein
+78.5 20.0
+          IONIC strength and radius of ions
+xxxxx 2.0
+          NO ADD TITR SITES, SITES DATA:a4,1x,a4,1x,f5.1,1x,i2
+0
+	  CYS to be included, how many? and their res numbers
+x
+x x
+          DATA for new diel. map: nmap and nsph. Put nsph=0 for no_map
+1.4 500
+

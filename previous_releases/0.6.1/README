@@ -1,0 +1,85 @@
+                             pyUHBD README
+
+                           Michael J. Harms
+                        B. Garcia-Moreno E. Lab
+                      The Johns Hopkins University
+                            August 2, 2006
+
+pyUHBD is a python wrapper that performes single-site finite difference contiuum
+electrostatics calculations on pdb files using the University of Houston 
+Brownian Dynamics (UHBD) package.  
+
+Environment: 
+    The system must have a valid compile of UHBD that is user executable.  
+    pyUHBD finds the location of this directory through the $UHBD environment
+    variable.  Specifically, pyUHBD calls the following binaries:
+        prepares
+        uhbd
+        getgrids
+        doinps
+        getpots
+        hybrid
+    NOTE: This script *REQUIRES* Python 2.4 or later!
+    
+Input files:
+    The main file required by pyUHBD is a pdb file *with* hydrogens.  We usually
+    add them using the CHARMm hbuild command, then use the UHBD command 
+    charmm2pdbs to convert it into "proper" UHBD readable format. 
+
+    Some modes (dielec and salts) require another input file.  This input file
+    is simply a list of dielectric constants/salt concentrations at which the
+    calculation will be run.  Lines beginning with "#" (no quotes) are ignored
+    as comments.
+
+    pyUHBD uses two standard input files, pkaS.dat and pkaS-doinp.inp.src, which
+    reside in the inputs/ folder.  pkaS.dat is a parameter file containing VDW 
+    radii and other information about each atom.  For more information see the 
+    UHBD documentation.  pkaS-doinp.inp.src is a template command file that 
+    pyUHBD uses to run UHBD.  In particular, every position in that file with
+    an "x" will be replaced automatically based on the pdb file and the other 
+    input files.  [NOTE! DO NOT MANUALLY EDIT THE "x" VALUES!  THEY WILL BE 
+    OVERWRITTEN BY pyUHBD.  The only lines can can be profitably edited are 
+    the grid sizes, the number of iterations, the temperature, the solvent 
+    dielectric constant, and the nmap/nsph values.] 
+
+    The values that pyUHBD will fill in automatically are as follows:
+        1. Number of first residue in chain 
+        2. Number of last residue in chain
+        3. Number of histidines and their tautomeric state (NE2)
+        4. Coarse grid size.  (The code finds the longest distance separating
+           charge in the pdb, multiplies this by 1.5, then divides by 65 to get
+           the size of the coarse grids).
+        5. User-specified protein dielectric constant
+        6. User-specified ionic strength
+        7. Number of free cystines and their residue numbers.  (The code finds
+           free cys with a sipmle distance-cutoff.  If the SG-SG distance of two
+           cys is < 3.5 A, they are treated as a disulfide bond and are
+           ignored).  
+
+    The function that does these calculations if FileOps.setupInp.  
+
+Temporary files:
+    UHBD generates a fair number of temporary files.  pyUHBD only keeps those 
+    that will be informative.  During the run, temporary files are stored in 
+    $HOME/.pyUHBD.  If the run crashes for some reason, the last-accessed
+    temporary directory contains all of the temporary files for debugging
+    purposes.  These directories will have to be manually deleted as pyUHBD
+    keeps no record of crashed runs.  If the run exits normally, the results
+    will be copied to an output directory (usually uhbd_calcs, although this
+    can be changed at the command line) and the temporary directory will be
+    deleted.
+
+Invocation:
+    To start a run, cd in to the directory containing the pdb file(s) on which
+    you wish to perform calculations.  pyUHBD will use this directory as its
+    working directory (i.e. the directory where it will look for files and will
+    place its output directory).  To invoke, run:
+
+        python [SOME_PATH_TO_SCRIPT]/pyUHBD.py [mode] [arguments] [options]
+    
+    If you invoke the code without specifying a mode, it will list the available
+    modes for the version you are using.  If you type:
+
+        python pyUHBD.py SOME_MODE --help
+
+    you will get a list of required and optional arguments for that mode. 

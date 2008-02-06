@@ -1,0 +1,11 @@
+0.6.1: 060522
+    Changed output directory structure slightly.  Now includes subfolders for
+dielectric constants.
+    Used to be:
+        uhbd_calcs/{0.1,0.2...} 
+    Now:
+        uhbd_calcs/{D4,D10..}/{0.1,0.2...}
+
+Changed temporary directory.  Now writes out sane date.  Instead of random 
+number, appends sequential letter.  Also now writes to $HOME/.pyUHBD instead of
+script/scratch/.  (For multiple users).
