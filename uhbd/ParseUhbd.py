@@ -24,7 +24,7 @@ LOCKED_SETTINGS = {"iterations":300,"added_residues":0,"change_acid":"n",
 # Files to keep for clean up
 SINGLE_KEEPFILES = ['hybrid.out','pkaS-doinp.inp','pkaS-potentials',
                     'pkaS-sitesinpr.pdb','titraa.pdb']
-FULL_KEEPFILES =   ['hybrid.out','doinp.inp','pkaF-potentials']
+FULL_KEEPFILES =   ['hybrid.out','doinp.inp','pkaF-potentials','sites.dat']
 
 # In a perfect world, the following global options would be attributes of each
 # option in parser. This would involve some large, non-intuitive modifications
