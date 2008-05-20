@@ -55,7 +55,8 @@ def runUHBD(inputfile,outputfile):
 
 def runSingleCalculation(calc_param):
     """
-    Peform pH titration on filename.
+    Calculate potentials and calculate pH titration of system using "single-
+    site" parameter set.
     """
 
     # Set up aliases for binaries
@@ -95,7 +96,10 @@ def runSingleCalculation(calc_param):
 
 
 def runFullCalculation(calc_param):
-    """Peform pH titration on filename."""
+    """
+    Calculate potentials and calculate pH titration of system using "full"
+    parameter set.
+    """
 
     # Set up aliases for binaries
     getgrid = os.path.join(bin_path,'getgrid')
@@ -117,6 +121,7 @@ def runFullCalculation(calc_param):
     print 'Getgrid'
     SystemOps.runBin(getgrid)
 
+    counter = 0
     print 'Running stopnow loop.'
     while os.path.isfile('stopnow') == False:
         SystemOps.runBin(doinp)
@@ -129,6 +134,16 @@ def runFullCalculation(calc_param):
         shutil.move('tempallG.pdb','allgroups.pdb')
         shutil.move('tempallR.pdb','allresidues.pdb')
         shutil.move('tmp_for_pot.dat','for_pot.dat')
+
+        if calc_param.keep_temp:
+            out_dir = "%3i" % counter
+            out_dir.replace(" ","0")
+            SystemOps.makeDir(out_dir)
+            for f in os.listdir("."):
+                shutil.copy(f,out_dir)
+        
+        counter += 1
+
 
     shutil.copy('potentials','pkaF-potentials')
 

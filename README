@@ -3,8 +3,8 @@
                            Michael J. Harms
                         B. Garcia-Moreno E. Lab
                       The Johns Hopkins University
-                            January 28, 2008
-                               v 1.1.0
+                             May 19, 2008
+                               v 1.1.1
 
 pyUHBD is a python wrapper that performes single-site finite difference contiuum
 electrostatics calculations on pdb files using the University of Houston
@@ -16,22 +16,22 @@ Environment:
     The system must have a valid compile of UHBD that is user executable.
     pyUHBD finds the location of this directory through the $UHBD environment
     variable.  Specifically, pyUHBD calls the following binaries:
-        uhbd (single site, full)
-        getgrids (single site), getgrid (full)
-        getpots (single site), getpot (full)
-        hybrids (single site), hybrid (full)
+        $UHBD/uhbd (single site, full)
+        $UHBD/getgrids (single site), $UHBD/getgrid (full)
+        $UHBD/getpots (single site), $UHBD/getpot (full)
+        $UHBD/hybrids (single site), $UHBD/hybrid (full)
 
     Hydrogens are added to the pdb files using pdb_addH.py, which is part of the
-    pdb_tools package.
+    pdb-tools package (http://pdb-tools.googlecode.com).
 
 
 Input files:
     The main file required by pyUHBD is a pdb file with hydrogens.  Such a file
-    can be created using pdb_addH.  There is a difference between the hydrogens
-    added for full or single-site calculations, so make sure that you specify
-    the correct option for addH.  The program will run with only a pdb file
-    (or set of pdb files) specified, but many other options can be chosen from
-    the command line (type pyUHBD -h for a list).
+    can be created using pdb_addH.py.  There is a difference between the
+    hydrogens added for full or single-site calculations, so make sure that you
+    specify the correct option for pdb_addH.  The program will run with only a
+    pdb file (or set of pdb files) specified, but many other options can be
+    chosen from the command line (type pyUHBD -h for a list).
 
     Some options require input files.  In most cases, these files can simply a
     list of numbers separated by whitespace (spaces, tabs, character returns).
@@ -52,7 +52,7 @@ Input files:
 Output:
     Output from a pyUHBD calculation is saved in a directory based on the pdb
     file input:
-        pdb_root/[single | full]/D[dielectric constant]/[ionic strength]/output
+        pdb_root/D[dielectric constant]/[ionic strength]/output
     The code does not perform any checks for previously performed calculations,
     so make sure you don't aren't going to wipe out a previous calculation when
     you set up a run.

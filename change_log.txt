@@ -66,4 +66,12 @@
  - Checks for errors in the UHBD output.  
  - Spits out a more detailed log of what it is doing at each step.
 
-
+080519:
+ - Changed output directory structure so it no longer has single or full 
+   subdirectory.  This is because the full/single calculations have to be in 
+   separate directories anyway because they have different pdb files.  This
+   directory was therefore superfluous.
+ - Full calculation now saves sites.dat (required for the "hybrid" calculation
+   if done later).
+ - Input pdb file now saved in each output directory.  Each directory now 
+   contains all information required to repeat the calculation manually.
