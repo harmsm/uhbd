@@ -137,9 +137,11 @@ def runFullCalculation(calc_param):
 
         if calc_param.keep_temp:
             out_dir = "%3i" % counter
-            out_dir.replace(" ","0")
+            out_dir = out_dir.replace(" ","0")
             SystemOps.makeDir(out_dir)
-            for f in os.listdir("."):
+
+            file_list = [f for f in os.listdir('.') if not os.path.isdir(f)]
+            for f in file_list:
                 shutil.copy(f,out_dir)
         
         counter += 1
