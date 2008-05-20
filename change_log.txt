@@ -80,4 +80,4 @@
    the "standard" implementation is to always take a certain set of atoms for
    every residue, regardless of what's in the parameter file.  Stupid.  I 
    deleted my "correct" code; it can be recapitulated by using svn to access
-   revision 189.
+   revision 190.
