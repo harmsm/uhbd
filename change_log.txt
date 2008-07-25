@@ -81,3 +81,4 @@
    every residue, regardless of what's in the parameter file.  Stupid.  I 
    deleted my "correct" code; it can be recapitulated by using svn to access
    revision 190.
+ - Fixed awkward check for file in ArgParser.py.
