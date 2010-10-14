@@ -117,7 +117,7 @@ def readParamFile(param_file):
             all_fields.update([(current_residue,
                 AminoAcidParameters(current_residue_field,"neutral"))])
             current_residue = line.split()[0]
-            current_residue_field = []
+            current_residue_field = [line]
         else:
             current_residue_field.append(line)
 
