@@ -137,7 +137,7 @@ def readParamFile(param_file):
                 err += "but no neutral entry!  Skipping..."
                 print err
             current_residue = line.split()[0]
-            current_residue_field = []
+            current_residue_field = [line]
         else:
             current_residue_field.append(line)
 
