@@ -49,12 +49,14 @@ def setupOverride(calc_param,filename):
     # Try to copy that file into the output directory
     if os.path.isfile(param_in_file):
         calc_param.param_file = calc_in_file
+        #shutil.copy(param_in_file,output_dir)
     else:
-        # See if paramater file is in the pyUHBD/parameters directory
+        # See if paramater file is in the pyUHBD/inputs directory
         default_file = os.path.join(pyUHBD_dir,"parameters",
                                     param_in_file)
         if os.path.isfile(default_file):
             calc_param.param_file = default_file
+            #shutil.copy(default_file,output_dir)
         else:
             # It cannot be found!
             err = "Unable to locate parameter file %s " % param_in_file
@@ -78,7 +80,8 @@ def indivRun(filename,calc_param):
         if calc_param.override != None:
             output_dir = setupOverride(calc_param,filename)
         else:
-            output_dir = [filename[:-4],"D%.1F" % calc_param.protein_dielec,
+            output_dir = [filename[:-4],calc_param.calc_type,
+                          "D%.1F" % calc_param.protein_dielec,
                           "%.1F" % calc_param.ionic_strength]
             output_dir = os.path.join(*output_dir)
             SystemOps.makeDir(output_dir)
@@ -103,7 +106,8 @@ def indivRun(filename,calc_param):
                 titr_dir = ""
 
             # Create output directory
-            output_dir = [filename[:-4],"D%.1F" % calc_param.protein_dielec,
+            output_dir = [filename[:-4],calc_param.calc_type,
+                          "D%.1F" % calc_param.protein_dielec,
                           "%.1F" % calc_param.ionic_strength,
                           titr_dir]
             output_dir = os.path.join(*output_dir)

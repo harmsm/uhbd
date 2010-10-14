@@ -66,19 +66,4 @@
  - Checks for errors in the UHBD output.  
  - Spits out a more detailed log of what it is doing at each step.
 
-080519:
- - Changed output directory structure so it no longer has single or full 
-   subdirectory.  This is because the full/single calculations have to be in 
-   separate directories anyway because they have different pdb files.  This
-   directory was therefore superfluous.
- - Full calculation now saves sites.dat (required for the "hybrid" calculation
-   if done later).
- - Input pdb file now saved in each output directory.  Each directory now 
-   contains all information required to repeat the calculation manually.
- - prepareFull no longer queries parameter file to see what residues to place 
-   in allgroups.pdb.  Although this was probably the correct way to do this,
-   the "standard" implementation is to always take a certain set of atoms for
-   every residue, regardless of what's in the parameter file.  Stupid.  I 
-   deleted my "correct" code; it can be recapitulated by using svn to access
-   revision 190.
- - Fixed awkward check for file in ArgParser.py.
+

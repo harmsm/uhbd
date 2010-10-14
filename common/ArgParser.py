@@ -35,8 +35,8 @@ def checkFile(option, opt, value):
     """
 
     # See if it's in the calling direcotry
-    if os.path.isfile(value):
-        return os.path.abspath(value)
+    if os.path.isfile(os.path.join(os.getcwd(),os.path.split(value)[-1])):
+        return os.path.join(os.getcwd(),os.path.split(value)[-1])
     else:
         default_file = os.path.join(default_location,value)
         if os.path.isfile(default_file):
